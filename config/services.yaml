@@ -23,6 +23,6 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    App/Listener/JsonRequestDecoderListener:
+    App\Listener\JsonRequestDecoderListener:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request' }
