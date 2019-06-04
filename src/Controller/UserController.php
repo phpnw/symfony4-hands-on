@@ -25,11 +25,24 @@ class UserController
     /**
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @Route("/create")
+     * @Route("/", methods={"POST"})
      */
-    public function createAction(Request $request, EntityManagerInterface $entityManager)
+    public function createAction(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer)
     {
         $data = $request->request;
+
+        $password = $data->get('password');
+        $hashed = \password_hash($password, \PASSWORD_DEFAULT);
+
+        $data->set('hashedPassword', $hashed);
+        $data->remove('password');
+
+        // @todo Sort out the hydration of User objects.
+        $user = $serializer->deserialize($data, User::class, 'ParamBag');
+
+        return new JsonResponse($serializer->serialize($user, 'json'), 200, [], true);
+    }
+
     /**
      * @param string $username
      * @param UserRepository $userRepository
