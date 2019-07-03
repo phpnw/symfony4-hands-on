@@ -40,6 +40,11 @@ class User implements UserInterface
     private $hashedPassword;
 
     /**
+     * @ORM\Column(type="string", nullable=true, length=255)
+     */
+    private $bio;
+
+    /**
      * User constructor.
      * @param string $username
      */
@@ -105,5 +110,21 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBio()
+    {
+        return $this->bio;
+    }
+
+    /**
+     * @param mixed $bio
+     */
+    public function setBio(string $bio): void
+    {
+        $this->bio = $bio;
     }
 }

@@ -68,4 +68,31 @@ class UserController
 
         throw new NotFoundHttpException();
     }
+
+    /**
+     * @param Request $request
+     * @param EntityManager $entityManager
+     * @param UserRepository $userRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @Route("/{username}", methods={"PATCH"})
+     */
+    public function updateAction($username, Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $user = $userRepository->getUserByUsername($username);
+
+        if ($user === null) {
+            return new JsonResponse(['error' => "User not found with name $username"], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $request->request;
+        $user->setBio($data->get('bio'));
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse($serializer->serialize($user, 'json'), Response::HTTP_OK, [], true);
+    }
 }
