@@ -38,7 +38,8 @@ class UserNormalizer implements NormalizerInterface, NormalizerAwareInterface
         return [
             'username' => $object->getUsername(),
             'created_at' => $this->normalizer->normalize($object->getCreatedAt(), $format, $context),
-            'updated_at' => $this->normalizer->normalize($object->getUpdatedAt(), $format, $context),
+            'created_at' => $object->getCreatedAt()->format('Y-m-d H:i:s'),
+            'updated_at' => $object->getUpdatedAt()->format('Y-m-d H:i:s'),
         ];
     }
 
