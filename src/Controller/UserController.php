@@ -56,14 +56,14 @@ class UserController
     /**
      * @param string $username
      * @param UserRepository $userRepository
-     * @Route("/{username}")
+     * @Route("/{username}", methods={"GET"})
      */
     public function getAction(string $username, UserRepository $userRepository, SerializerInterface $serializer): Response
     {
         $user = $userRepository->getUserByUsername($username);
 
         if (null !== $user) {
-            return new JsonResponse($serializer->serialize($user, 'json'), 200, [], true);
+            return new JsonResponse($serializer->serialize($user, 'json'), Response::HTTP_OK, [], true);
         }
 
         throw new NotFoundHttpException();
