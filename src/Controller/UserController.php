@@ -27,9 +27,16 @@ class UserController
      * @param EntityManagerInterface $entityManager
      * @Route("/", methods={"POST"})
      */
-    public function createAction(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function createAction(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UserRepository $userRepository)
     {
         $data = $request->request;
+
+        $username = $data->get('username');
+        $existing_user = $userRepository->getUserByUsername($username);
+
+        if ($existing_user !== null) {
+            return new JsonResponse(['error' => "User with name $username already exists"], Response::HTTP_BAD_REQUEST);
+        }
 
         $password = $data->get('password');
         $hashed = \password_hash($password, \PASSWORD_DEFAULT);
@@ -37,10 +44,13 @@ class UserController
         $data->set('hashedPassword', $hashed);
         $data->remove('password');
 
-        // @todo Sort out the hydration of User objects.
-        $user = $serializer->deserialize($data, User::class, 'ParamBag');
+        $json_encode = \json_encode($data->all());
+        $user = $serializer->deserialize($json_encode, User::class, 'json');
 
-        return new JsonResponse($serializer->serialize($user, 'json'), 200, [], true);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse($serializer->serialize($user, 'json'), Response::HTTP_CREATED, [], true);
     }
 
     /**
